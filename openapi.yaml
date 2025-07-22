@@ -1,20 +1,102 @@
 openapi: 3.1.1
 info:
   version: "1.0"
-  title: AppFirst
+  title: Fake API Store
+  description: |-
+    This is a sample FakeAPI Store Server based on the OpenAPI 3.X specification. You can find out more about Swagger at https://swagger.io. In the third iteration of the pet store, we've switched to the design first approach. You can now help us improve the API whether it's by making changes to the definition itself or to the code. That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+    
+    Some useful links:
+    - [The Fake Store repository](https://github.com/platzi/curso-apifirst)
+  termsOfService: https://fakeapi.example.com/terms/
+  contact:
+    name: API Support
+    url: https://fakeapi.example.com/support
+    email: support@fakeapi.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:3000/v1
+    description:  Version 1 de la AppFirst
+  - url: http://localhost:3000/v2
+    description:  Version 2 de la AppFirst
+tags:
+  - name: hello
+    description: Operaciones de saludo
+    externalDocs:
+      description: Más sobre hello
+      url: https://fakeapi.example.com/docs/hello
+  - name: users
+    description: Operaciones de usuarios
+    externalDocs:
+      description: Más sobre usuarios
+      url: https://fakeapi.example.com/docs/users
+  - name: products
+    description: Operaciones de productos
+    externalDocs:
+      description: Más sobre productos
+      url: https://fakeapi.example.com/docs/products
+externalDocs:
+  description: Documentación completa de la Fake API Store
+  url: https://fakeapi.example.com/docs
 components:
   schemas:
     HelloResponse:
       type: object
+    Product:
+      type: object
+      required:
+        - name
+        - price
+        - category
       properties:
-        message:
+        name:
           type: string
-          example: Hello world
+          minLength: 2
+          maxLength: 40
+        description:
+          type: string
+          maxLength: 500
+        price:
+          type: number
+          minimum: 0
+          multipleOf: 0.01
+        category: 
+          type: string
+          enum: [electronics, books, clothes, food]
+        tags: 
+          type: array
+          items: 
+            type: string
+            minLength: 1
+        inStock: 
+          type: boolean
+        specifications: 
+          type: object
+          additionalProperties:
+            type: string
+        ratings: 
+          type: object
+          items: 
+            required:
+              - score
+              - comment
+            properties:
+              score: 
+                type: integer
+                minimum: 1
+                maximum: 5
+              comment:
+                type: string
+                maxLength: 500
+          
+
+    
 paths:
   /hello:
     get:
+      tags:
+        - hello
       summary: hello world
       responses:
         '200':
@@ -25,6 +107,8 @@ paths:
                 $ref: '#/components/schemas/HelloResponse'
   /users:
     post:
+      tags:
+        - users
       summary: Crear un nuevo usuario
       requestBody:
         required: true
@@ -62,8 +146,13 @@ paths:
                     type: integer
                   email:
                     type: string
+    externalDocs:
+      description: Más sobre usuarios
+      url: https://fakeapi.example.com/docs/users
   /users/{id}:
     get:
+      tags:
+        - users
       summary: Obtener un usuario por ID
       parameters:
         - in: path
@@ -93,6 +182,8 @@ paths:
                   message:
                     type: string
     post:
+      tags:
+        - users
       summary: Actualizar el nombre del usuario
       parameters:
         - in: path
@@ -154,3 +245,124 @@ paths:
                 properties:
                   message:
                     type: string
+    externalDocs:
+      description: Más sobre usuarios
+      url: https://fakeapi.example.com/docs/users
+  /products:
+    post:
+      tags:
+        - products
+      summary: Crear un nuevo producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    get:
+      tags:
+        - products
+      summary: Listar productos
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    externalDocs:
+      description: Más sobre productos
+      url: https://fakeapi.example.com/docs/products
+  /products/{id}:
+    get:
+      tags:
+        - products
+      summary: Obtener producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      tags:
+        - products
+      summary: Actualizar producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags:
+        - products
+      summary: Eliminar producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Producto eliminado
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    externalDocs:
+      description: Más sobre productos
+      url: https://fakeapi.example.com/docs/products
