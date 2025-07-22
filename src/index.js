@@ -80,6 +80,16 @@ v1Router.post('/users/:id', (req, res) => {
 })
 v2Router.post('/users/:id', v1Router.stack.find(r => r.route && r.route.path === '/users/:id' && r.route.methods.post).route.stack[0].handle)
 
+v1Router.delete('/users/:id', (req, res) => {
+  const id = req.params.id
+  if (!users.has(id)) {
+    return res.status(404).json({ message: 'Usuario no encontrado' })
+  }
+  users.delete(id)
+  res.status(204).send()
+})
+v2Router.delete('/users/:id', v1Router.stack.find(r => r.route && r.route.path === '/users/:id' && r.route.methods.delete).route.stack[0].handle)
+
 // PRODUCTS
 v1Router.post('/products', (req, res) => {
   const product = req.body
